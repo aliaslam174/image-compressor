@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <title>Pro Image Compressor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
-body { background: #f5f7fa; }
+body { background: #f5f7fa; font-family:sans-serif; }
 header { background: #fff; padding: 10px 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top:0; z-index:10;}
-header .nav-link { color:#333; font-weight:500; }
-header .nav-link:hover { color:#0d6efd; }
-footer { background:#fff; text-align:center; padding:20px; margin-top:30px; box-shadow:0 -2px 5px rgba(0,0,0,0.05);}
 .drop-area { border:2px dashed #6c757d; padding:40px; text-align:center; cursor:pointer; border-radius:10px; background:#fff; transition:0.3s; }
 .drop-area:hover { background:#f1f3f6; }
 img { max-width:120px; margin:5px; cursor:pointer; border:1px solid #ccc; border-radius:5px; }
@@ -24,7 +24,6 @@ img { max-width:120px; margin:5px; cursor:pointer; border:1px solid #ccc; border
 </head>
 <body>
 
-<!-- Header -->
 <header class="d-flex justify-content-between align-items-center flex-wrap">
   <div class="d-flex align-items-center mb-2">
     <img src="/mnt/data/7e4a041c-5100-4c9b-b1c3-72f998055ef0.png" alt="Logo" style="height:40px; margin-right:10px;">
@@ -50,20 +49,17 @@ img { max-width:120px; margin:5px; cursor:pointer; border:1px solid #ccc; border
   </div>
 </div>
 
-<!-- Loader -->
 <div id="loaderOverlay">
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>
 </div>
 
-<!-- Lightbox -->
 <div id="lightbox">
   <span id="closeBtn">&times;</span>
   <img id="lightboxImg" src="">
 </div>
 
-<!-- Footer -->
 <footer>
   &copy; 2026 Pro Image Compressor | All rights reserved
 </footer>
@@ -82,23 +78,31 @@ const lightboxImg = document.getElementById('lightboxImg');
 const closeBtn = document.getElementById('closeBtn');
 const loaderOverlay = document.getElementById('loaderOverlay');
 
+// Click to select files (mobile fix included)
 dropArea.addEventListener('click', () => {
   const input = document.createElement('input');
   input.type = 'file';
   input.multiple = true;
   input.accept = 'image/*,application/pdf';
-    input.onchange = e => {
-    handleFiles(e.target.files);
 
-    // 🔥 IMPORTANT FIX
-    input.value = "";
+  input.onchange = e => {
+    handleFiles(e.target.files);
+    input.remove(); // remove after use to allow next selection
   };
+
+  document.body.appendChild(input); // temporarily add to DOM
   input.click();
 });
 
+// Drag & drop
 dropArea.addEventListener('dragover', e => e.preventDefault());
-dropArea.addEventListener('drop', e => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
+dropArea.addEventListener('drop', e => { 
+  e.preventDefault(); 
+  handleFiles(e.dataTransfer.files);
+  e.dataTransfer.clearData(); // reset for next drag
+});
 
+// Preview function
 function handleFiles(fileList) {
   files = Array.from(fileList);
   preview.innerHTML = "";
@@ -132,15 +136,15 @@ function showLightbox(src) { lightbox.style.display = "flex"; lightboxImg.src = 
 closeBtn.onclick = () => { lightbox.style.display = "none"; }
 lightbox.onclick = (e) => { if(e.target === lightbox) lightbox.style.display = "none"; }
 
-// Compression keeping max quality
+// Compress function
 async function compressToTarget(file, targetKB = null) {
   if (!file.type.startsWith("image/")) return file;
 
-  if(!targetKB) targetKB = Math.round((file.size / 1024) * 0.3); // default 30% of original
+  if(!targetKB) targetKB = Math.round((file.size / 1024) * 0.3);
 
   const options = {
     maxSizeMB: targetKB/1024,
-    maxWidthOrHeight: file.width > 1920 ? 1920 : undefined,
+    maxWidthOrHeight: 1920,
     initialQuality: 0.95,
     useWebWorker: true
   };
@@ -172,11 +176,23 @@ compressBtn.addEventListener('click', async () => {
     col.className = "col-6 col-md-4 col-lg-3 text-center mb-4";
 
     if(file.type.startsWith("image/")) {
-      const before = document.createElement('img'); before.src = URL.createObjectURL(file); before.title="Original"; before.onclick = () => showLightbox(before.src);
-      const after = document.createElement('img'); after.src = URL.createObjectURL(finalFile); after.title="Compressed"; after.onclick = () => showLightbox(after.src);
-      col.appendChild(before); col.appendChild(document.createElement('br')); col.appendChild(after);
+      const before = document.createElement('img'); 
+      before.src = URL.createObjectURL(file); 
+      before.title="Original"; 
+      before.onclick = () => showLightbox(before.src);
+
+      const after = document.createElement('img'); 
+      after.src = URL.createObjectURL(finalFile); 
+      after.title="Compressed"; 
+      after.onclick = () => showLightbox(after.src);
+
+      col.appendChild(before); 
+      col.appendChild(document.createElement('br')); 
+      col.appendChild(after);
     } else {
-      const icon = document.createElement('p'); icon.innerText = "📄 "+file.name; col.appendChild(icon);
+      const icon = document.createElement('p'); 
+      icon.innerText = "📄 "+file.name; 
+      col.appendChild(icon);
     }
 
     const text = document.createElement('p');
