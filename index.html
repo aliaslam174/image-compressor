@@ -87,7 +87,12 @@ dropArea.addEventListener('click', () => {
   input.type = 'file';
   input.multiple = true;
   input.accept = 'image/*,application/pdf';
-  input.onchange = e => handleFiles(e.target.files);
+    input.onchange = e => {
+    handleFiles(e.target.files);
+
+    // 🔥 IMPORTANT FIX
+    input.value = "";
+  };
   input.click();
 });
 
