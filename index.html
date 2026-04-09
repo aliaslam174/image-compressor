@@ -85,17 +85,17 @@ fileInput.multiple = true;
 fileInput.accept = 'image/*,application/pdf';
 fileInput.style.display = 'none';
 document.body.appendChild(fileInput);
-
+// 3️⃣ DropArea click pe input trigger karo
+dropArea.addEventListener('click', () => {
+    fileInput.click();
+});
 // 2️⃣ File selection handle karo
 fileInput.onchange = e => {
     handleFiles(e.target.files);
     fileInput.value = ""; // 🔹 Important fix for mobile
 };
 
-// 3️⃣ DropArea click pe input trigger karo
-dropArea.addEventListener('click', () => {
-    fileInput.click();
-});
+
 
 // Drag & drop
 dropArea.addEventListener('dragover', e => e.preventDefault());
