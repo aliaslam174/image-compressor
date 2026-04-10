@@ -71,7 +71,6 @@ img { max-width:120px; margin:5px; cursor:pointer; border:1px solid #ccc; border
 <script>
 let files = [];
 const dropArea = document.getElementById('dropArea');
-  alert(dropArea);
 const compressBtn = document.getElementById('compressBtn');
 const preview = document.getElementById('preview');
 const lightbox = document.getElementById('lightbox');
@@ -88,7 +87,9 @@ fileInput.style.display = 'none';
 document.body.appendChild(fileInput);
 // 3️⃣ DropArea click pe input trigger karo
 dropArea.addEventListener('click', () => {
-    fileInput.click();
+alert("Hello World");
+  fileInput.click();
+  alert("Hello World");
 });
 // 2️⃣ File selection handle karo
 fileInput.onchange = e => {
