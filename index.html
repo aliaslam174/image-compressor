@@ -104,7 +104,10 @@ dropArea.addEventListener('dragover', e => e.preventDefault());
 dropArea.addEventListener('drop', e => { 
   e.preventDefault(); 
   handleFiles(e.dataTransfer.files);
+  alert("Drag & drop");
   e.dataTransfer.clearData(); // reset for next drag
+    alert("Drag & drop");
+
 });
 
 // Preview function
